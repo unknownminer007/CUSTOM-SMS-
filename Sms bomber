@@ -1,0 +1,38 @@
+mkdir sms-api
+cd sms-api
+npm init -ynpm install express twilio body-parserconst express = require('express');
+const bodyParser = require('body-parser');
+const twilio = require('twilio');
+
+const app = express();
+app.use(bodyParser.json());
+
+// Twilio credentials
+const accountSid = 'YOUR_TWILIO_ACCOUNT_SID'; // Replace with your Twilio Account SID
+const authToken = 'YOUR_TWILIO_AUTH_TOKEN';   // Replace with your Twilio Auth Token
+const client = twilio(accountSid, authToken);
+
+// Endpoint to send SMS
+app.post('/send_sms', async (req, res) => {
+    const { to, body } = req.body;
+
+    try {
+        const message = await client.messages.create({
+            body: body,
+            from: 'YOUR_TWILIO_PHONE_NUMBER', // Replace with your Twilio phone number
+            to: to
+        });
+
+        res.status(200).json({ message: 'SMS sent successfully', sid: message.sid });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+    console.log(`Server is running on port ${PORT}`);
+});node index.js{
+  "to": "+1234567890", // Replace with recipient's phone number
+  "body": "Hello from your custom SMS API!"
+}
